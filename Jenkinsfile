@@ -33,11 +33,11 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                withCredentials([string(credentialsId: 'dockerhub-password', variable: 'DOCKER_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-password', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
-                    echo $DOCKER_PASSWORD | docker login -u Ke102erthi --password-stdin
-                    docker tag cicd-demo Ke102erthi/cicd-demo
-                    docker push Ke102erthi/cicd-demo
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    docker tag cicd-demo $DOCKER_USER/cicd-demo
+                    docker push $DOCKER_USER/cicd-demo
                     '''
                 }
             }
@@ -45,7 +45,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker run -d -p 80:3000 Ke102erthi/cicd-demo'
+                sh 'docker run -d -p 80:3000 $DOCKER_USER/cicd-demo'
             }
         }
     }
